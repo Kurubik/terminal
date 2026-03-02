@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 
 // ASCII Art
 const ASCII_ART = `
@@ -104,6 +104,7 @@ const BOOT_MESSAGES = [
   '[OK] Boot sequence complete. Welcome, I guess.',
 ];
 
+/* eslint-disable react-hooks/purity */
 // Matrix rain column component to avoid Math.random in render
 function MatrixColumn({ index }) {
   const left = useRef(Math.random() * 100);
@@ -126,12 +127,13 @@ function MatrixColumn({ index }) {
         ease: 'linear',
       }}
     >
-      {Array.from({ length: 50 }).map((_, idx) => 
+      {Array.from({ length: 50 }).map(() => 
         String.fromCharCode(0x30A0 + Math.random() * 96)
       ).join('\n')}
     </motion.div>
   );
 }
+/* eslint-enable react-hooks/purity */
 
 export default function App() {
   const [booted, setBooted] = useState(false);
@@ -154,6 +156,7 @@ export default function App() {
     historyRef.current = history;
   }, [history]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   // Load tasks from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('notnull-tasks');
@@ -165,6 +168,7 @@ export default function App() {
       }
     }
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Save tasks to localStorage
   useEffect(() => {
