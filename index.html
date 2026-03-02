@@ -1,14 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>terminal</title>
-    <script type="module" crossorigin src="./assets/index-GtZUHpxs.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DrMh7cA2.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOTNULL Terminal</title>
+  <link rel="icon" type="image/svg+xml" href="vite.svg">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #root { width: 100%; height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Fira Code', 'Courier New', monospace;
+      background-color: #050505;
+      color: #00ff41;
+    }
+    .scanlines::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+      pointer-events: none;
+      z-index: 10;
+    }
+    .vignette::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.8) 100%);
+      pointer-events: none;
+      z-index: 11;
+    }
+    @keyframes crtFlicker {
+      0%, 100% { opacity: 0.98; }
+      50% { opacity: 1; }
+      52% { opacity: 0.97; }
+      54% { opacity: 1; }
+    }
+    .crt-flicker { animation: crtFlicker 0.15s infinite; }
+    .text-glow {
+      text-shadow: 0 0 5px rgba(0, 255, 65, 0.5), 0 0 10px rgba(0, 255, 65, 0.3);
+    }
+    ::selection { background: #00ff41; color: #050505; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="app.js"></script>
+</body>
 </html>
