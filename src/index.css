@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  background-color: #050505;
+  color: #00ff41;
+}
+
+/* CRT Scanlines */
+.scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Vignette effect */
+.vignette::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  pointer-events: none;
+  z-index: 11;
+}
+
+/* Flicker animation for CRT effect */
+@keyframes crtFlicker {
+  0%, 100% { opacity: 0.98; }
+  50% { opacity: 1; }
+  52% { opacity: 0.97; }
+  54% { opacity: 1; }
+}
+
+.crt-flicker {
+  animation: crtFlicker 0.15s infinite;
+}
+
+/* Text glow effect */
+.text-glow {
+  text-shadow: 0 0 5px rgba(0, 255, 65, 0.5),
+               0 0 10px rgba(0, 255, 65, 0.3),
+               0 0 20px rgba(0, 255, 65, 0.1);
+}
+
+/* Glitch effect */
+@keyframes glitch {
+  0% { transform: translate(0); filter: hue-rotate(0deg); }
+  10% { transform: translate(-3px, 3px); filter: hue-rotate(90deg); }
+  20% { transform: translate(3px, -3px); filter: hue-rotate(180deg); }
+  30% { transform: translate(-3px, -3px); filter: hue-rotate(270deg); }
+  40% { transform: translate(3px, 3px); filter: hue-rotate(360deg); }
+  50% { transform: translate(-3px, 3px); filter: hue-rotate(90deg); }
+  60% { transform: translate(3px, -3px); filter: hue-rotate(180deg); }
+  70% { transform: translate(-3px, -3px); filter: hue-rotate(270deg); }
+  80% { transform: translate(3px, 3px); filter: hue-rotate(360deg); }
+  90% { transform: translate(-3px, 3px); filter: hue-rotate(90deg); }
+  100% { transform: translate(0); filter: hue-rotate(0deg); }
+}
+
+.glitch-active {
+  animation: glitch 0.3s ease-in-out;
+}
+
+/* Cursor blink */
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Matrix rain */
+@keyframes matrixRain {
+  0% { transform: translateY(-100%); opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.matrix-rain {
+  animation: matrixRain 2s linear infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00ff41;
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00aa2a;
+}
+
+/* Input styling */
+input:focus {
+  outline: none;
+}
+
+/* Selection color */
+::selection {
+  background: #00ff41;
+  color: #050505;
+}
