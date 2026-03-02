@@ -4,28 +4,11 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NOTNULL Terminal</title>
-    <script type="module" crossorigin src="./assets/index-54r2OteU.js"></script>
+    <title>terminal</title>
+    <script type="module" crossorigin src="./assets/index-GtZUHpxs.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-DrMh7cA2.css">
-    <style>
-      body { background: #050505; margin: 0; }
-      #error-display { 
-        color: #00ff41; 
-        font-family: monospace; 
-        padding: 20px; 
-        display: none; 
-      }
-    </style>
   </head>
   <body>
     <div id="root"></div>
-    <div id="error-display"></div>
-    <script>
-      window.onerror = function(msg, url, line) {
-        document.getElementById('error-display').style.display = 'block';
-        document.getElementById('error-display').innerHTML = 
-          '<h3>ERROR:</h3><pre>' + msg + '<br>at ' + url + ':' + line + '</pre>';
-      };
-    </script>
   </body>
 </html>
