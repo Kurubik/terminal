@@ -104,6 +104,35 @@ const BOOT_MESSAGES = [
   '[OK] Boot sequence complete. Welcome, I guess.',
 ];
 
+// Matrix rain column component to avoid Math.random in render
+function MatrixColumn({ index }) {
+  const left = useRef(Math.random() * 100);
+  const duration = useRef(1 + Math.random() * 2);
+  
+  return (
+    <motion.div
+      key={index}
+      className="absolute text-terminal-green font-mono text-xs whitespace-pre"
+      style={{
+        left: `${left.current}%`,
+        top: '-100%',
+      }}
+      animate={{
+        top: '100%',
+      }}
+      transition={{
+        duration: duration.current,
+        repeat: Infinity,
+        ease: 'linear',
+      }}
+    >
+      {Array.from({ length: 50 }).map((_, idx) => 
+        String.fromCharCode(0x30A0 + Math.random() * 96)
+      ).join('\n')}
+    </motion.div>
+  );
+}
+
 export default function App() {
   const [booted, setBooted] = useState(false);
   const [bootIndex, setBootIndex] = useState(0);
@@ -112,13 +141,18 @@ export default function App() {
   const [tasks, setTasks] = useState([]);
   const [glitching, setGlitching] = useState(false);
   const [matrixRain, setMatrixRain] = useState(false);
-  const [showDossier, setShowDossier] = useState(false);
   const [crashed, setCrashed] = useState(false);
   const [rebooting, setRebooting] = useState(false);
   const [konamiIndex, setKonamiIndex] = useState(0);
   
   const inputRef = useRef(null);
   const terminalRef = useRef(null);
+  const historyRef = useRef([]);
+
+  // Keep history ref in sync
+  useEffect(() => {
+    historyRef.current = history;
+  }, [history]);
 
   // Load tasks from localStorage on mount
   useEffect(() => {
@@ -164,6 +198,28 @@ export default function App() {
     }
   }, [booted]);
 
+  // Callbacks defined before useEffect that needs them
+  const triggerMatrixRain = useCallback(() => {
+    setMatrixRain(true);
+    setTimeout(() => setMatrixRain(false), 5000);
+  }, []);
+
+  const addToHistory = useCallback((type, content) => {
+    setHistory(prev => [...prev, { type, content, timestamp: Date.now() }]);
+  }, []);
+
+  const triggerCrash = useCallback(() => {
+    setCrashed(true);
+    setTimeout(() => {
+      setRebooting(true);
+      setTimeout(() => {
+        setCrashed(false);
+        setRebooting(false);
+        addToHistory('system', 'Stop trying to break reality. Stay NOT NULL.');
+      }, 2000);
+    }, 2000);
+  }, [addToHistory]);
+
   // Konami code listener
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -184,28 +240,11 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [konamiIndex, matrixRain, crashed]);
+  }, [konamiIndex, matrixRain, crashed, triggerMatrixRain]);
 
   const triggerGlitch = useCallback(() => {
     setGlitching(true);
     setTimeout(() => setGlitching(false), 300);
-  }, []);
-
-  const triggerMatrixRain = useCallback(() => {
-    setMatrixRain(true);
-    setTimeout(() => setMatrixRain(false), 5000);
-  }, []);
-
-  const triggerCrash = useCallback(() => {
-    setCrashed(true);
-    setTimeout(() => {
-      setRebooting(true);
-      setTimeout(() => {
-        setCrashed(false);
-        setRebooting(false);
-        addToHistory('system', 'Stop trying to break reality. Stay NOT NULL.');
-      }, 2000);
-    }, 2000);
   }, []);
 
   const getRandomResponse = (type) => {
@@ -213,11 +252,7 @@ export default function App() {
     return responses[Math.floor(Math.random() * responses.length)];
   };
 
-  const addToHistory = (type, content) => {
-    setHistory(prev => [...prev, { type, content, timestamp: Date.now() }]);
-  };
-
-  const handleCommand = (cmd) => {
+  const handleCommand = useCallback((cmd) => {
     const trimmed = cmd.trim().toLowerCase();
     
     if (!trimmed) return;
@@ -227,7 +262,6 @@ export default function App() {
     // Hidden triggers
     if (trimmed === 'sudo --whois-god' || trimmed === 'whoami --root') {
       triggerGlitch();
-      setShowDossier(true);
       addToHistory('system', '[SECURITY BREACH DETECTED]');
       addToHistory('ascii', HIDDEN_DOSSIER);
       return;
@@ -243,7 +277,7 @@ export default function App() {
     const command = args[0];
 
     switch (command) {
-      case 'help':
+      case 'help': {
         addToHistory('system', getRandomResponse('help'));
         addToHistory('output', `
 Available commands:
@@ -258,8 +292,9 @@ Secret commands:
   Try to find them, detective.
         `.trim());
         break;
+      }
 
-      case 'todo':
+      case 'todo': {
         const taskMatch = cmd.match(/todo\s+["']?(.+?)["']?$/i);
         if (taskMatch) {
           const taskText = taskMatch[1].trim();
@@ -271,6 +306,7 @@ Secret commands:
           addToHistory('error', 'Usage: todo "your task here". Even that seems hard for you.');
         }
         break;
+      }
 
       case 'ls':
         if (tasks.length === 0) {
@@ -284,7 +320,7 @@ Secret commands:
         }
         break;
 
-      case 'done':
+      case 'done': {
         const index = parseInt(args[1]);
         if (isNaN(index) || index < 0 || index >= tasks.length) {
           addToHistory('error', `Invalid index. There are ${tasks.length} tasks. Math is hard, I know.`);
@@ -297,6 +333,7 @@ Secret commands:
           addToHistory('system', getRandomResponse('done'));
         }
         break;
+      }
 
       case 'clear':
         setHistory([]);
@@ -315,7 +352,7 @@ Secret commands:
         triggerGlitch();
         addToHistory('error', getRandomResponse('invalid'));
     }
-  };
+  }, [addToHistory, tasks, triggerCrash, triggerGlitch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -351,26 +388,7 @@ Secret commands:
     return (
       <div className="w-full h-screen bg-black overflow-hidden relative">
         {Array.from({ length: 20 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute text-terminal-green font-mono text-xs whitespace-pre"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: '-100%',
-            }}
-            animate={{
-              top: '100%',
-            }}
-            transition={{
-              duration: 1 + Math.random() * 2,
-              repeat: Infinity,
-              ease: 'linear',
-            }}
-          >
-            {Array.from({ length: 50 }).map(() => 
-              String.fromCharCode(0x30A0 + Math.random() * 96)
-            ).join('\n')}
-          </motion.div>
+          <MatrixColumn key={i} index={i} />
         ))}
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
@@ -438,7 +456,7 @@ Secret commands:
               {/* Header */}
               <div className="flex items-center justify-between mb-4 text-terminal-green-dim text-xs">
                 <span>NOTNULL_TERMINAL v9.9.9</span>
-                <span>type 'help' if you're lost</span>
+                <span>type 'help' if you&apos;re lost</span>
               </div>
 
               {/* Terminal Output */}
@@ -454,7 +472,7 @@ Secret commands:
                   {ASCII_ART}
                 </motion.pre>
 
-                {history.map((entry, i) => (
+                {history.map((entry) => (
                   <motion.div
                     key={entry.timestamp}
                     initial={{ opacity: 0, y: 10 }}

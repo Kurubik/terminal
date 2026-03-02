@@ -1,8 +1,13 @@
+@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --color-terminal-bg: #050505;
+  --color-terminal-green: #00ff41;
+  --color-terminal-green-dim: #00aa2a;
+  --color-terminal-green-glow: rgba(0, 255, 65, 0.5);
+  --font-mono: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+}
 
 :root {
   color-scheme: dark;
@@ -68,6 +73,8 @@ body {
   50% { opacity: 1; }
   52% { opacity: 0.97; }
   54% { opacity: 1; }
+  90% { opacity: 0.99; }
+  92% { opacity: 0.95; }
 }
 
 .crt-flicker {
